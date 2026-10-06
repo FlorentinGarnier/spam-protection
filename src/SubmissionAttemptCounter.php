@@ -43,6 +43,25 @@ final class SubmissionAttemptCounter
 
     private function getCacheItem(string $scope, string $ipAddress): CacheItemInterface
     {
-        return $this->cache->getItem('spam_protection.' . hash('sha256', $scope . '|' . $ipAddress));
+        return $this->cache->getItem('spam_protection.' . hash('sha256', $scope . '|' . $this->identifyNetwork($ipAddress)));
+    }
+
+    /**
+     * An IPv6 subscriber usually controls a whole /64 network, so attempts are counted per /64 rather than per
+     * address. An IPv4-mapped IPv6 address is counted as the IPv4 address it carries.
+     */
+    private function identifyNetwork(string $ipAddress): string
+    {
+        if (false === filter_var($ipAddress, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6)) {
+            return $ipAddress;
+        }
+
+        $packedAddress = inet_pton($ipAddress);
+
+        if (str_starts_with($packedAddress, str_repeat("\0", 10) . "\xff\xff")) {
+            return inet_ntop(substr($packedAddress, 12));
+        }
+
+        return inet_ntop(substr($packedAddress, 0, 8) . str_repeat("\0", 8)) . '/64';
     }
 }

@@ -43,8 +43,9 @@ final class SpamProtection
         IpReputation $ipReputation,
         int $baseDifficulty = 10,
         int $maximumAttemptsPerHour = 20,
+        ?TokenLock $tokenLock = null,
     ): self {
-        $usedTokens = new SingleUseTokenRegistry($cache);
+        $usedTokens = new SingleUseTokenRegistry($cache, $tokenLock);
 
         return new self(
             new SubmissionToken($secret, $usedTokens),

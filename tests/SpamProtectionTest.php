@@ -125,6 +125,15 @@ final class SpamProtectionTest extends TestCase
         self::assertSame(RejectionReason::RateLimitExceeded, $this->submit()->rejectionReason);
     }
 
+    public function testItRateLimitsAnIpv6NetworkAsAWhole(): void
+    {
+        for ($host = 1; $host <= 7; ++$host) {
+            $this->submit(honeypot: 'spam', ipAddress: '2001:db8:1:2::' . $host);
+        }
+
+        self::assertSame(RejectionReason::RateLimitExceeded, $this->submit(ipAddress: '2001:db8:1:2::99')->rejectionReason);
+    }
+
     public function testItStartsWithAHarderProofOfWorkForHostingAndVpnAddresses(): void
     {
         self::assertSame(8, $this->spamProtection->issueChallenge(self::SCOPE, self::HOSTING_IP)->difficulty);

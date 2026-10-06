@@ -47,7 +47,8 @@ required difficulty grows with the attempts of the IP address on the form:
 | 10 and more       | 18 bits                              | several seconds              |
 
 An accepted submission counts as 1 attempt, a rejected one as 3. The counter is kept per form and per IP
-address, and expires one hour after the last attempt.
+address, and expires one hour after the last attempt. IPv6 addresses are counted per /64 network, since a single
+subscriber usually controls a whole /64 and could otherwise change address on every submission.
 
 ### IP reputation
 
@@ -99,8 +100,14 @@ $spamProtection = SpamProtection::create(
     ipReputation: new IpReputation(new IpReputationList(__DIR__.'/var/ip_reputation.php')),
     baseDifficulty: 10,         // optional
     maximumAttemptsPerHour: 20, // optional
+    tokenLock: $tokenLock,      // recommended, see below
 );
 ```
+
+PSR-6 offers no atomic "add if absent": without a lock, two requests sent at the same instant with the same
+token could both be accepted. Implement `FlorentinGarnier\SpamProtection\TokenLock` with the locking tool you
+already use (a Redis `SET NX`, a database advisory lock…), shared by all your web servers. `acquire()` must not
+wait: it returns `false` at once when another request holds the lock.
 
 ### 2. Embed a challenge in the form
 
