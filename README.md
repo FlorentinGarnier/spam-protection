@@ -1,6 +1,8 @@
 # Spam Protection
 
 [![CI](https://github.com/FlorentinGarnier/spam-protection/actions/workflows/ci.yml/badge.svg)](https://github.com/FlorentinGarnier/spam-protection/actions/workflows/ci.yml)
+[![Latest Version](https://img.shields.io/packagist/v/florentingarnier/spam-protection.svg)](https://packagist.org/packages/florentingarnier/spam-protection)
+[![Total Downloads](https://img.shields.io/packagist/dt/florentingarnier/spam-protection.svg)](https://packagist.org/packages/florentingarnier/spam-protection)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![PHP](https://img.shields.io/badge/php-%5E8.2-777bb4.svg)
 
@@ -74,14 +76,6 @@ than 5 consecutive consonants. A text is rejected when at least half of its anal
 - JavaScript in the visitor's browser, to solve the proof of work
 
 ## Installation
-
-The package is not published on Packagist yet. Declare its repository in your `composer.json`:
-
-```json
-"repositories": [
-    {"type": "vcs", "url": "https://github.com/FlorentinGarnier/spam-protection"}
-]
-```
 
 ```bash
 composer require florentingarnier/spam-protection
