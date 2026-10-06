@@ -1,0 +1,45 @@
+{
+    "name": "florentingarnier/spam-protection",
+    "description": "Invisible CAPTCHA alternative: honeypot, single-use timed tokens, proof of work, rate limiting, IP reputation and gibberish detection.",
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://github.com/FlorentinGarnier/spam-protection",
+    "authors": [
+        {
+            "name": "Florentin Garnier",
+            "homepage": "https://github.com/FlorentinGarnier"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/FlorentinGarnier/spam-protection/issues",
+        "source": "https://github.com/FlorentinGarnier/spam-protection",
+        "security": "https://github.com/FlorentinGarnier/spam-protection/security/policy"
+    },
+    "keywords": [
+        "captcha",
+        "spam",
+        "honeypot",
+        "proof-of-work"
+    ],
+    "require": {
+        "php": "^8.2",
+        "psr/cache": "^1.0 || ^2.0 || ^3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5 || ^11.5 || ^12.0",
+        "symfony/cache": "^5.4 || ^6.4 || ^7.4 || ^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "FlorentinGarnier\\SpamProtection\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "FlorentinGarnier\\SpamProtection\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
