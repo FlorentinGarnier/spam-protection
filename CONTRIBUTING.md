@@ -1,11 +1,11 @@
 # Contributing
 
-Thank you for considering a contribution!
+Thank you for considering a contribution! By participating in this project, you agree to abide by its
+[Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Reporting a bug or suggesting a feature
 
-Open an [issue](https://github.com/FlorentinGarnier/spam-protection/issues) describing what you expected, what happened, and how to reproduce it (PHP
-version, package version, and a minimal code sample). For security issues, do **not** open an issue: follow
+Open an issue with the [bug report or feature request form](https://github.com/FlorentinGarnier/spam-protection/issues/new/choose). For security issues, do **not** open an issue: follow
 [SECURITY.md](SECURITY.md).
 
 ## Submitting a pull request
