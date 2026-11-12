@@ -36,6 +36,8 @@ final class SpamProtectionTest extends TestCase
 
     private const TOR_IP = '192.0.2.1';
 
+    private const MESSAGE_WITH_EXTERNAL_LINK = 'How much is a custom cover? All the details are on https://offers.example/fr/shop';
+
     private SpamProtection $spamProtection;
 
     protected function setUp(): void
@@ -174,6 +176,45 @@ final class SpamProtectionTest extends TestCase
         self::assertSame(8, $this->spamProtection->issueChallenge(self::SCOPE, self::NORMAL_IP)->difficulty);
     }
 
+    public function testItRejectsAMessageLinkingToAnotherSiteFromAHostingOrVpnAddress(): void
+    {
+        $verdict = $this->submit(contents: [self::MESSAGE_WITH_EXTERNAL_LINK], ipAddress: self::HOSTING_IP);
+
+        self::assertSame(RejectionReason::ExternalLinkFromRiskyAddress, $verdict->rejectionReason);
+        self::assertSame(IpRiskLevel::Hosting, $verdict->ipRiskLevel);
+    }
+
+    public function testItRejectsAMessageLinkingToAnotherSiteFromATorExitNode(): void
+    {
+        $verdict = $this->submit(contents: [self::MESSAGE_WITH_EXTERNAL_LINK], ipAddress: self::TOR_IP);
+
+        self::assertSame(RejectionReason::ExternalLinkFromRiskyAddress, $verdict->rejectionReason);
+    }
+
+    /**
+     * Customers send links too: a photo, a drawing, a competitor's product.
+     */
+    public function testItAcceptsAMessageLinkingToAnotherSiteFromANormalAddress(): void
+    {
+        self::assertTrue($this->submit(contents: [self::MESSAGE_WITH_EXTERNAL_LINK])->isAccepted());
+    }
+
+    public function testItAcceptsAMessageWithoutLinkFromAHostingOrVpnAddress(): void
+    {
+        self::assertTrue($this->submit(contents: ['Hello, I would like a quote for a shelving unit.'], ipAddress: self::HOSTING_IP)->isAccepted());
+    }
+
+    public function testItAcceptsAMessageLinkingToTheSiteItselfFromAHostingOrVpnAddress(): void
+    {
+        $verdict = $this->submit(
+            contents: ['Is https://www.shop.example/products/shelf-12 available in black?'],
+            ipAddress: self::HOSTING_IP,
+            ownHosts: ['shop.example'],
+        );
+
+        self::assertTrue($verdict->isAccepted());
+    }
+
     public function testItIssuesFreshTokensOnEveryChallenge(): void
     {
         $first = $this->spamProtection->issueChallenge(self::SCOPE, self::NORMAL_IP);
@@ -187,6 +228,7 @@ final class SpamProtectionTest extends TestCase
      * Builds a valid human submission, then breaks the parts given as arguments.
      *
      * @param list<string> $contents
+     * @param list<string> $ownHosts
      */
     private function submit(
         string $honeypot = '',
@@ -195,6 +237,7 @@ final class SpamProtectionTest extends TestCase
         ?string $proofOfWorkSolution = null,
         array $contents = [],
         string $ipAddress = self::NORMAL_IP,
+        array $ownHosts = [],
     ): Verdict {
         $challenge = $this->spamProtection->issueChallenge(self::SCOPE, $ipAddress);
         $proofOfWorkChallenge ??= $challenge->proofOfWorkChallenge;
@@ -206,6 +249,7 @@ final class SpamProtectionTest extends TestCase
             proofOfWorkChallenge: $proofOfWorkChallenge,
             proofOfWorkSolution: $proofOfWorkSolution ?? SpamProtectionTestHelper::solveProofOfWork($proofOfWorkChallenge, $challenge->difficulty),
             contents: $contents,
+            ownHosts: $ownHosts,
         ), $ipAddress);
     }
 }

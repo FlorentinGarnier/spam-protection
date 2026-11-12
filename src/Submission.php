@@ -18,7 +18,9 @@ final readonly class Submission
     /**
      * @param string       $scope    identifies the form, so that tokens and rate limits are not shared between forms
      * @param string       $honeypot value of the trap field, left empty by humans
-     * @param list<string> $contents free texts of the form, rejected when made of random characters
+     * @param list<string> $contents free texts of the form, rejected when made of random characters, or when they link
+     *                               to another site from a risky IP address
+     * @param list<string> $ownHosts hosts of the site, such as "example.com": links to them are not external
      */
     public function __construct(
         public string $scope,
@@ -27,6 +29,7 @@ final readonly class Submission
         public string $proofOfWorkChallenge,
         public string $proofOfWorkSolution,
         public array $contents = [],
+        public array $ownHosts = [],
     ) {
     }
 }

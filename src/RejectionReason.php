@@ -23,4 +23,5 @@ enum RejectionReason: string
     case InvalidProofOfWork = 'invalid_proof_of_work';
     case RateLimitExceeded = 'rate_limit_exceeded';
     case UnreadableContent = 'unreadable_content';
+    case ExternalLinkFromRiskyAddress = 'external_link_from_risky_address';
 }
