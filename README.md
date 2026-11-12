@@ -73,8 +73,8 @@ than 5 consecutive consonants. A text is rejected when at least half of its anal
 
 ### External links
 
-Spam written by a language model reads like a customer's message, down to the name of your products: what gives it
-away is the link it advertises, and the server it is sent from. Neither is a proof alone. Customers send links
+Some spam reads like a customer's message, down to the name of your products: what gives it away is the link it
+advertises, and the server it is sent from. Neither is a proof alone. Customers send links
 too, and some of them browse through a VPN. Together they are: a submission is rejected when one of its free
 texts links to another site **and** its IP address is `hosting` or `tor`.
 
