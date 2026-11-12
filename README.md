@@ -31,6 +31,7 @@ Each submission goes through the following checks, in this order. The first fail
 | Proof of work | `invalid_proof_of_work` | the browser did not provide a valid solution, or reused one |
 | Rate limit | `rate_limit_exceeded` | the IP address has used up its attempts on this form (20 by default) |
 | Content | `unreadable_content` | a free-text field is made of random characters, such as `dTqLzVbKxWmPfRjN` |
+| External link | `external_link_from_risky_address` | a free-text field links to another site, and the IP address is a datacenter, a VPN or a Tor exit node |
 
 Tokens and proof-of-work challenges are **single-use**: a fresh challenge is issued every time the form is
 displayed.
@@ -69,6 +70,16 @@ in a browser (18 bits with the default base).
 Only words of at least 6 Latin letters are analysed, so references (`RX-450B`) and acronyms pass. A word looks
 random when it has more than one lowercase-to-uppercase transition (`iPhone` has one, `dTqLzV` has two) or more
 than 5 consecutive consonants. A text is rejected when at least half of its analysed words look random.
+
+### External links
+
+Spam written by a language model reads like a customer's message, down to the name of your products: what gives it
+away is the link it advertises, and the server it is sent from. Neither is a proof alone. Customers send links
+too, and some of them browse through a VPN. Together they are: a submission is rejected when one of its free
+texts links to another site **and** its IP address is `hosting` or `tor`.
+
+A link starts with `http://`, `https://` or `www.`. Links to the hosts given in `ownHosts`, and to their
+subdomains, are not external: a customer can always paste the address of one of your pages.
 
 ## Requirements
 
@@ -142,6 +153,7 @@ $verdict = $spamProtection->verify(new Submission(
     proofOfWorkChallenge: $_POST['proof_challenge'] ?? '',
     proofOfWorkSolution: $_POST['proof_solution'] ?? '',
     contents: [$_POST['message'] ?? ''],
+    ownHosts: ['example.com'],
 ), $clientIp);
 
 if (!$verdict->isAccepted()) {
@@ -191,6 +203,7 @@ Use a low `baseDifficulty` (4, for example) in tests to keep them fast.
   to trust it. Otherwise all visitors share the proxy's address, and the rate limit applies to everyone at once.
 - **IPv4 only** for IP reputation: IPv6 addresses are considered `normal`.
 - **Residential proxies** are not in any list. They are still slowed down by the proof of work and rate limited.
+- **Links without `http://`, `https://` or `www.`**, such as `example.com/page`, are not detected.
 - **Visitors without JavaScript** cannot submit a protected form.
 - This library stops automated spam. It does not replace input validation, CSRF protection or rate limiting of
   sensitive operations such as login.

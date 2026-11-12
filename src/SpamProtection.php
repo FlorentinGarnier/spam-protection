@@ -31,6 +31,7 @@ final class SpamProtection
         private IpReputation $ipReputation,
         private GibberishDetector $gibberishDetector,
         private int $maximumAttemptsPerHour = 20,
+        private ExternalLinkDetector $externalLinkDetector = new ExternalLinkDetector(),
     ) {
     }
 
@@ -93,6 +94,7 @@ final class SpamProtection
             !$this->proofOfWork->consume($submission->proofOfWorkChallenge, $submission->proofOfWorkSolution, $this->getRequiredDifficulty($previousAttempts, $riskLevel)) => RejectionReason::InvalidProofOfWork,
             $previousAttempts >= $this->maximumAttemptsPerHour => RejectionReason::RateLimitExceeded,
             $this->containsGibberish($submission->contents) => RejectionReason::UnreadableContent,
+            IpRiskLevel::Normal !== $riskLevel && $this->containsExternalLink($submission) => RejectionReason::ExternalLinkFromRiskyAddress,
             default => null,
         };
     }
@@ -104,6 +106,20 @@ final class SpamProtection
     {
         foreach ($contents as $content) {
             if ($this->gibberishDetector->isGibberish($content)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * A link alone is not a proof: customers send links too. A risky address alone is not one either.
+     */
+    private function containsExternalLink(Submission $submission): bool
+    {
+        foreach ($submission->contents as $content) {
+            if ($this->externalLinkDetector->containsExternalLink($content, $submission->ownHosts)) {
                 return true;
             }
         }

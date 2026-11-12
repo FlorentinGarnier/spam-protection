@@ -8,6 +8,14 @@ changes.
 
 ## [Unreleased]
 
+### Added
+
+- A submission is rejected when one of its free texts links to another site and its IP address is a datacenter,
+  a VPN or a Tor exit node (`external_link_from_risky_address`). Spam written by a language model passes the
+  content check; a link sent from a normal address is still accepted.
+- `Submission::$ownHosts`, the hosts of the site, whose links are not external.
+- `ExternalLinkDetector`, an optional last argument of the `SpamProtection` constructor.
+
 ## [0.2.0] - 2026-10-06
 
 ### Security
